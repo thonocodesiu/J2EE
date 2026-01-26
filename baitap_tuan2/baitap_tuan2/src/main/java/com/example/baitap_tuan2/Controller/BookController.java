@@ -28,8 +28,8 @@ public class BookController {
     }
     @PutMapping("/addupdate")
     public String addOrUpdateBook(@RequestBody Book book) {
-        bookService.addBookupdateBook(book);
-        return "book add thanh cong";
+        String a = bookService.addBookupdateBook(book);
+        return a;
     }
      @DeleteMapping("/delete/{id}")
      public String deleteBook(@PathVariable ("id") String id) {
