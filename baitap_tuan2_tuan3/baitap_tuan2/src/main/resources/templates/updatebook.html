@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Stark Terminal - Update Protocol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --stark-blue: #00d4ff;
+            --stark-dark: #0a0a0b;
+            --stark-gold: #ffc107; /* Màu vàng Iron Man cho nút Update */
+            --stark-red: #ed1d24;
+            --neon-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+        }
+
+        body {
+            background-color: var(--stark-dark);
+            font-family: 'Roboto', sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        .container {
+            width: 450px;
+            background: rgba(10, 10, 12, 0.95);
+            padding: 40px;
+            border: 2px solid var(--stark-gold); /* Viền vàng cho trang Update */
+            box-shadow: var(--neon-shadow), inset 0 0 20px rgba(255, 193, 7, 0.1);
+            position: relative;
+            animation: systemBoot 0.8s ease-out;
+        }
+
+        /* Góc HUD đặc trưng */
+        .container::before, .container::after {
+            content: "";
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--stark-blue);
+        }
+        .container::before { top: -10px; left: -10px; border-right: 0; border-bottom: 0; }
+        .container::after { bottom: -10px; right: -10px; border-left: 0; border-top: 0; }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--stark-gold);
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px var(--stark-gold);
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--stark-blue);
+            margin-bottom: 8px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #444;
+            border-right: 4px solid var(--stark-gold);
+            padding: 12px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            background: rgba(255, 193, 7, 0.1);
+            border-color: var(--stark-gold);
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-update {
+            width: 100%;
+            background: var(--stark-gold);
+            color: black;
+            border: none;
+            padding: 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            clip-path: polygon(0 0, 90% 0, 100% 30%, 100% 100%, 10% 100%, 0 70%);
+        }
+
+        .btn-update:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--stark-gold);
+        }
+
+        .btn-cancel {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--stark-blue);
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            opacity: 0.7;
+        }
+
+        .btn-cancel:hover { opacity: 1; text-shadow: 0 0 5px var(--stark-blue); }
+
+        /* Animation khởi động hệ thống */
+        @keyframes systemBoot {
+            0% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.5; transform: scaleX(1); }
+            100% { opacity: 1; }
+        }
+
+        /* Thanh quét dữ liệu */
+        .scanner-bar {
+            width: 100%;
+            height: 1px;
+            background: var(--stark-gold);
+            position: absolute;
+            left: 0;
+            animation: sweep 2.5s infinite linear;
+            opacity: 0.3;
+        }
+
+        @keyframes sweep {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="scanner-bar"></div>
+        <h2>System Calibration</h2>
+        
+        <form th:action="@{/api/books/addupdate}" method="POST">
+            <input type="hidden" name="id" th:value="${book.id}">
+            
+            <div class="form-group">
+                <label>Modify Title</label>
+                <input type="text" name="title" th:value="${book.title}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Identify Author</label>
+                <input type="text" name="author" th:value="${book.author}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Re-evaluating Price ($)</label>
+                <input type="number" step="0.01" name="price" th:value="${book.price}" required>
+            </div>
+            
+            <button type="submit" class="btn-update">Confirm Overwrite</button>
+        </form>
+        
+        <a th:href="@{/api/books/}" class="btn-cancel">Abort Connection</a>
+    </div>
+
+</body>
+</html>

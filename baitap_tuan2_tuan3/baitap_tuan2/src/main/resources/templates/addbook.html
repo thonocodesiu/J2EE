@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Stark Terminal - Book Protocol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --stark-blue: #00d4ff;
+            --stark-dark: #0a0a0b;
+            --stark-red: #ed1d24;
+            --neon-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+
+        body {
+            background-color: var(--stark-dark);
+            font-family: 'Roboto', sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            /* Nền họa tiết lưới công nghệ */
+            background-image: linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .container {
+            width: 450px;
+            background: rgba(15, 15, 15, 0.9);
+            padding: 40px;
+            border: 2px solid var(--stark-blue);
+            box-shadow: var(--neon-shadow), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            position: relative;
+            animation: containerEntry 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Hiệu ứng góc vuông HUD */
+        .container::before, .container::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--stark-red);
+        }
+        .container::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
+        .container::after { bottom: -5px; right: -5px; border-left: 0; border-top: 0; }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--stark-blue);
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px var(--stark-blue);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--stark-blue);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            border-left: 4px solid var(--stark-blue);
+            padding: 12px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--stark-blue);
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: inset 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--stark-red);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.4s;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%); /* Cắt góc kiểu Jarvis */
+        }
+
+        .btn-submit:hover {
+            background: var(--stark-blue);
+            color: black;
+            box-shadow: 0 0 20px var(--stark-blue);
+            transform: scale(1.02);
+        }
+
+        .btn-back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover { color: var(--stark-blue); }
+
+        /* Animation */
+        @keyframes containerEntry {
+            from { opacity: 0; transform: scale(0.9) translateY(30px); filter: blur(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
+
+        /* Scanline effect */
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 212, 255, 0.2);
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: scan 4s linear infinite;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="scanline"></div>
+        <h2>Accessing Archive</h2>
+        
+        <form th:action="@{/api/books/addupdate}" method="POST">
+            <input type="hidden" name="id" th:value="${book != null ? book.id : ''}">
+
+            <div class="form-group">
+                <label>Data Title</label>
+                <input type="text" name="title" th:value="${book != null ? book.title : ''}" 
+                       placeholder="Identity of the book..." required>
+            </div>
+
+            <div class="form-group">
+                <label>Origin Author</label>
+                <input type="text" name="author" th:value="${book != null ? book.author : ''}" 
+                       placeholder="Creator name..." required>
+            </div>
+
+            <div class="form-group">
+                <label>Resource Price ($)</label>
+                <input type="number" step="0.01" name="price" 
+                       th:value="${book != null ? book.price : ''}" 
+                       placeholder="0.00" required>
+            </div>
+
+            <button type="submit" class="btn-submit">Execute Upload</button>
+        </form>
+
+        <a th:href="@{/api/books/}" class="btn-back">← Return to Main Terminal</a>
+    </div>
+
+</body>
+</html>

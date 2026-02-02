@@ -9,6 +9,7 @@ import com.example.baitap_tuan2.models.Book;
 
 @Service
 public class BookService {
+
     private List<Book> books = new ArrayList<>();
 
     public BookService() {
@@ -23,19 +24,25 @@ public class BookService {
         return books;
     }
 
-    public List<Book> getBookById(String id) {
-        for (Book book : books) {
-            if (book.getId().equals(id)) {
-                List<Book> result = new ArrayList<>();
-                result.add(book);
-                return result;
-            }
-        }
-        return books;
+    public Book getBookById(String id) {
+        return books.stream()
+                .filter(b -> b.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     public String addBookupdateBook(Book book) {
-        if (book.getId() == null) {
+        if (book.getId() == null || book.getId().trim().isEmpty()) {
+            int maxId = 0;
+            if (!books.isEmpty()) {
+                maxId = books.stream()
+                        .mapToInt(b -> Integer.parseInt(b.getId())) 
+                        .max() 
+                        .orElse(0);
+            }
+
+            // Gán ID mới = Max + 1
+            book.setId(String.valueOf(maxId + 1));
             books.add(book);
             return "Book added successfully";
         } else {
